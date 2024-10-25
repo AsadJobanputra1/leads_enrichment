@@ -91,25 +91,20 @@ def query_openai(company):
     logging.info(f"Querying OpenAI for company: {company}")
     prompt = f"Act as an online researcher for the given {company} field: how many students attend the university, what recent work have they done in AI, provide three links to AI work that {company} has done recently. Provide output in structured JSON format."
     
-    response = openai.chat.completions.create(
-        model="gpt-4o",
-        messages=[
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": prompt}
-        ]
-    )
-
+    
  # Start the chat with the initial prompt
     response = openai.ChatCompletion.create(
         model=os.getenv('OPENAI_MODEL', 'gpt-4o-2024-08-06'),  # Default to 'gpt-4o-2024-08-06' if not set
         messages=[
             {"role": "system", "content": "You are a helpful assistant."},
             {"role": "user", "content": prompt}
-        ]
+        ],
+        response_format=enrichedData,
     )
 
     logging.info(f"Querying OpenAI for company: {response.choices[0].message['content']}")
-    return response.choices[0].message['content']
+    enrichedDataObj = response.choices[0].message.parsed
+    return enrichedDataObj
 
 def create_enriched_row(row, response):
     logging.info("Creating enriched row from OpenAI {response}.")
