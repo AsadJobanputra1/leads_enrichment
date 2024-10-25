@@ -173,8 +173,8 @@ Proceed through each SPARC step, using the variables provided. At each step, inc
 #### Tasks:
 
 - **Utilize AI Models**:
-  - Use a highly capable model (e.g., **o1 Preview**) to define the architecture and devise solutions.
-  - Employ a cost-effective model (e.g., **GPT-4o** or **GPT-4o-Mini**) to implement these designs.
+  - Use a highly capable model (e.g., **openai/gpt-4o**) to define the architecture and devise solutions.
+  - Employ a cost-effective model (e.g., **openai/gpt-4o-Mini**) to implement these designs.
 
 - **Architectural Style**:
   - Choose an appropriate style (e.g., MVC, microservices) based on **{Technical_Constraints}**.
