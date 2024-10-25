@@ -70,7 +70,6 @@ def load_csv_to_list(file_path):
 
 def enrich_data_with_openai(data_list):
     logging.info("Starting data enrichment with OpenAI.")
-    openai.api_key = os.getenv('OPENAI_API_KEY')
     enriched_data = []
     for row in data_list:
         response = query_openai(row['Company'])
@@ -91,18 +90,24 @@ def query_openai(company):
     logging.info(f"Querying OpenAI for company: {company}")
     prompt = f"Act as an online researcher for the given {company} field: how many students attend the university, what recent work have they done in AI, provide three links to AI work that {company} has done recently. Provide output in structured JSON format."
     
-    
+    openai_client = openai.Client(
+    api_key=os.getenv('OPENAI_API_KEY') )
+    conversation = [{
+        "role":"system",
+        "content": f"""You are a helpful online researching assistant"""
+    }]
+
  # Start the chat with the initial prompt
-    response = openai.ChatCompletion.create(
+    response = openai_client.beta.chat.completions.parse(
         model=os.getenv('OPENAI_MODEL', 'gpt-4o-2024-08-06'),  # Default to 'gpt-4o-2024-08-06' if not set
         messages=[
-            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "system", "content": "You are a helpful online researching assistant."},
             {"role": "user", "content": prompt}
         ],
         response_format=enrichedData,
     )
 
-    logging.info(f"Querying OpenAI for company: {response.choices[0].message['content']}")
+    logging.info(f"Querying OpenAI for company: {response.choices[0].message.content}")
     enrichedDataObj = response.choices[0].message.parsed
     return enrichedDataObj
 
@@ -126,7 +131,7 @@ def create_enriched_row(row, response):
 def save_to_csv(data, filename):
     logging.info(f"Saving enriched data to CSV file: {filename}")
     with open(filename, mode='w', newline='') as file:
-        fieldnames = ['ID', 'firstname', 'lastname', 'Title', 'Company', 'Number of Students', 'Recent AI work', 'AI link 1', 'AI link 2', 'AI link 3']
+        fieldnames = ['ID', 'firstname', 'lastname', 'Title', 'Company', 'description','Number of Students', 'Recent AI work', 'AI link 1', 'AI link 2', 'AI link 3']
         writer = csv.DictWriter(file, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(data)
