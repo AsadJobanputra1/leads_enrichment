@@ -116,7 +116,7 @@ def query_openai(company):
     enrichedDataObj = response.choices[0].message.parsed
     return enrichedDataObj
 
-def create_enriched_row(row, response):
+def create_enriched_row(row, response: enrichedData):
     logging.info("Creating enriched row from OpenAI {response}.")
     # This is a placeholder for parsing logic
     return {
