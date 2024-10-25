@@ -3,6 +3,8 @@ import csv
 import openai
 import logging
 from datetime import datetime
+from pydantic import BaseModel, ConfigDict
+
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -76,6 +78,15 @@ def enrich_data_with_openai(data_list):
         enriched_data.append(enriched_row)
     return enriched_data
 
+
+class enrichedData(BaseModel):
+        description: str
+        NumStudents: str
+        Recent_AI_work: str
+        AI_link_1: str
+        AI_link_2: str
+        AI_link_3: str
+
 def query_openai(company):
     logging.info(f"Querying OpenAI for company: {company}")
     prompt = f"Act as an online researcher for the given {company} field: how many students attend the university, what recent work have they done in AI, provide three links to AI work that {company} has done recently. Provide output in structured JSON format."
@@ -84,13 +95,26 @@ def query_openai(company):
         model="gpt-4o",
         messages=[
             {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": "Hello!"}
+            {"role": "user", "content": prompt}
         ]
     )
-    return response.choices[0].message.strip()
+
+ # Start the chat with the initial prompt
+    response = openai.beta.chat.completions.parse(  # original non-beta version ). .chat.completions.create(
+        model = os.getenv('OPENAI_MODEL', 'gpt-4o-2024-08-06'),  # Default to 'gpt-4o-2024-08-06' if not set
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": prompt}
+        ],
+        response_format=enrichedData) 
+    
+
+
+    logging.info(f"Querying OpenAI for company: {response.choices[0].message}")
+    return response.choices[0].message
 
 def create_enriched_row(row, response):
-    logging.info("Creating enriched row from OpenAI response.")
+    logging.info("Creating enriched row from OpenAI {response}.")
     # This is a placeholder for parsing logic
     return {
         'ID': row.get('ID', ''),
@@ -98,11 +122,12 @@ def create_enriched_row(row, response):
         'lastname': row.get('LastName', ''),
         'Title': row.get('Title', ''),
         'Company': row.get('Company', ''),
-        'Number of Students': 'N/A',  # Extract from response
-        'Recent AI work': 'N/A',      # Extract from response
-        'AI link 1': 'N/A',           # Extract from response
-        'AI link 2': 'N/A',           # Extract from response
-        'AI link 3': 'N/A'            # Extract from response
+        'description': response.description,
+        'Number of Students': response.NumStudents,  # Extract from response
+        'Recent AI work': response.Recent_AI_work,      # Extract from response
+        'AI link 1': response.AI_link_1,           # Extract from response
+        'AI link 2': response.AI_link_2,           # Extract from response
+        'AI link 3': response.AI_link_3            # Extract from response
     }
 
 def save_to_csv(data, filename):
