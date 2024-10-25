@@ -49,7 +49,7 @@ def display_menu():
 def process_csv_file():
     logging.info("Starting CSV file processing.")
     input_file = input("Enter the input CSV file path: ")
-    output_file = input("Enter the output CSV file path (optional): ") or 'output.csv'
+    output_file = input("Enter the output CSV file path (optional): ") or f"docs/output{datetime.now().strftime('%Y%m%d-%H%M%S')}.csv"
     if not is_valid_csv(input_file):
         print("Error: Invalid CSV file.")
         return
