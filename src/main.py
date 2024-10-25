@@ -65,15 +65,15 @@ def enrich_data_with_openai(data_list):
 
 def query_openai(company):
     prompt = f"Act as an online researcher for the given {company} field: how many students attend the university, what recent work have they done in AI, provide three links to AI work that {company} has done recently. Provide output in structured JSON format."
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
+    
+    response = openai.chat.completions.create(
+        model="gpt-4o",
         messages=[
             {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": prompt}
-        ],
-        max_tokens=150
+            {"role": "user", "content": "Hello!"}
+        ]
     )
-    return response['choices'][0]['message']['content'].strip()
+    return response.choices[0].message.strip()
 
 def create_enriched_row(row, response):
     # Parse the OpenAI response and combine it with the original row
