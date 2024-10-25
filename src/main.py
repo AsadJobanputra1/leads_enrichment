@@ -126,7 +126,7 @@ def create_enriched_row(row, response: enrichedData):
         'Title': row.get('Title', ''),
         'Company': row.get('Company', ''),
         'description': response.description,
-        'Number of Students': response.number_of_students
+        'Number of Students': response.number_of_students,
         'Recent AI work': response.Recent_AI_work,      # Extract from response
         'AI link 1': response.AI_link_1,           # Extract from response
         'AI link 2': response.AI_link_2,           # Extract from response
