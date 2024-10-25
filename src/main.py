@@ -100,18 +100,16 @@ def query_openai(company):
     )
 
  # Start the chat with the initial prompt
-    response = openai.beta.chat.completions.parse(  # original non-beta version ). .chat.completions.create(
-        model = os.getenv('OPENAI_MODEL', 'gpt-4o-2024-08-06'),  # Default to 'gpt-4o-2024-08-06' if not set
+    response = openai.ChatCompletion.create(
+        model=os.getenv('OPENAI_MODEL', 'gpt-4o-2024-08-06'),  # Default to 'gpt-4o-2024-08-06' if not set
         messages=[
             {"role": "system", "content": "You are a helpful assistant."},
             {"role": "user", "content": prompt}
-        ],
-        response_format=enrichedData) 
-    
+        ]
+    )
 
-
-    logging.info(f"Querying OpenAI for company: {response.choices[0].message}")
-    return response.choices[0].message
+    logging.info(f"Querying OpenAI for company: {response.choices[0].message['content']}")
+    return response.choices[0].message['content']
 
 def create_enriched_row(row, response):
     logging.info("Creating enriched row from OpenAI {response}.")
