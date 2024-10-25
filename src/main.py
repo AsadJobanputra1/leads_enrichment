@@ -80,7 +80,7 @@ def enrich_data_with_openai(data_list):
 
 class enrichedData(BaseModel):
         description: str
-        NumStudents: str
+        number_of_students: int
         Recent_AI_work: str
         AI_link_1: str
         AI_link_2: str
@@ -88,7 +88,12 @@ class enrichedData(BaseModel):
 
 def query_openai(company):
     logging.info(f"Querying OpenAI for company: {company}")
-    prompt = f"Act as an online researcher for the given {company} field: how many students attend the university, what recent work have they done in AI, provide three links to AI work that {company} has done recently. Provide output in structured JSON format."
+    prompt = f"""Act as an online researcher for the given {company} fields: 
+    description: brief description of the company
+    number_of_students: briefly describe how many students attend the university, 
+    Recent_AI_work: what recent work have they done in AI, 
+    AI_link: provide three links to AI work that {company} has done recently. Provide output in structured JSON format.
+    """
     
     openai_client = openai.Client(
     api_key=os.getenv('OPENAI_API_KEY') )
@@ -121,7 +126,7 @@ def create_enriched_row(row, response):
         'Title': row.get('Title', ''),
         'Company': row.get('Company', ''),
         'description': response.description,
-        'Number of Students': response.NumStudents,  # Extract from response
+        'Number of Students': response.number_of_students
         'Recent AI work': response.Recent_AI_work,      # Extract from response
         'AI link 1': response.AI_link_1,           # Extract from response
         'AI link 2': response.AI_link_2,           # Extract from response
